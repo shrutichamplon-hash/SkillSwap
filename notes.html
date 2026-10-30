@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap | Notes Marketplace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="app-layout.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <a class="brand" href="index.html">Skill<span>Swap</span></a>
+      <section class="user-card">
+        <p class="user-label">USERNAME</p>
+        <p class="user-name" id="sidebarName">user</p>
+        <p class="user-meta" id="sidebarMeta">Branch | Year</p>
+      </section>
+      <nav class="nav">
+        <a href="dash.html" data-page="dash">Dashboard</a>
+        <a href="connection.html" data-page="connections">Connections</a>
+        <a href="meetings.html" data-page="meetings">Meetings</a>
+        <a href="Ai_match.html" data-page="ai">AI Matching</a>
+        <a href="creds_batch.html" data-page="credits">Credits & Badges</a>
+        <a href="leaderboard.html" data-page="leaderboard">Leaderboard</a>
+        <a href="notes.html" data-page="notes">Notes Market</a>
+        <a href="consult.html" data-page="consult">Hire Consultant</a>
+        <a href="profile.html" data-page="profile">Edit Profile</a>
+      </nav>
+      <div class="spacer"></div>
+      <button id="logoutBtn" class="btn btn-gold" type="button">Logout</button>
+    </aside>
+
+    <main class="main-area">
+      <section class="topbar">
+        <input id="topSearch" class="search" type="search" placeholder="Search notes by title/subject..." />
+        <div class="top-chip">Notifications: 1</div>
+        <div id="topProfileName" class="top-chip">Profile</div>
+      </section>
+
+      <section class="panel hero">
+        <h1>Notes Marketplace</h1>
+        <p>Upload and sell engineering notes with mock buy flow.</p>
+      </section>
+
+      <section class="panel">
+        <h2 style="margin:0 0 .6rem;font-family:Sora,sans-serif;">Sell Notes</h2>
+        <div class="row-3">
+          <input id="noteTitle" class="input" placeholder="Title" />
+          <input id="noteSubject" class="input" placeholder="Subject (Python/DBMS/Math...)" />
+          <input id="notePrice" class="input" type="number" min="0" placeholder="Price" />
+        </div>
+        <div style="margin-top:.6rem;" class="row">
+          <input id="noteFile" class="input" type="file" accept=".pdf,image/*" />
+          <button id="uploadNote" class="btn btn-gold" type="button">Upload Note</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="row-3">
+          <input id="filterQuery" class="input" placeholder="Search..." />
+          <select id="filterSubject" class="select">
+            <option value="">All Subjects</option>
+            <option>Python</option>
+            <option>DBMS</option>
+            <option>Math</option>
+            <option>OS</option>
+            <option>DSA</option>
+          </select>
+          <button id="applyFilter" class="btn btn-outline" type="button">Apply Filter</button>
+        </div>
+        <div id="notesGrid" class="grid" style="margin-top:.7rem;"></div>
+      </section>
+    </main>
+  </div>
+  <div id="previewModal" style="position:fixed;inset:0;background:rgba(2,8,20,.72);display:none;align-items:center;justify-content:center;z-index:99;">
+    <div class="panel" style="width:min(520px,92%);">
+      <h3 id="modalTitle" style="margin:0 0 .45rem;"></h3>
+      <p id="modalSubject" class="muted"></p>
+      <p id="modalPrice" class="muted"></p>
+      <p id="modalFile" class="muted"></p>
+      <div style="display:flex;justify-content:flex-end;margin-top:.7rem;">
+        <button id="closeModal" class="btn btn-outline" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+  <div id="toastWrap" class="toast-wrap"></div>
+
+  <script src="app-layout.js"></script>
+  <script>
+    const user = SkillSwapApp.requireAuth();
+    if (!user) throw new Error("Auth required");
+    SkillSwapApp.setShell(user, "notes");
+
+    const notesGrid = document.getElementById("notesGrid");
+    const previewModal = document.getElementById("previewModal");
+    let notes = [];
+
+    const fallbackKey = "skillswap_notes_demo";
+
+    function toast(message) {
+      const wrap = document.getElementById("toastWrap");
+      const el = document.createElement("div");
+      el.className = "toast ok";
+      el.textContent = message;
+      wrap.appendChild(el);
+      setTimeout(() => el.remove(), 2200);
+    }
+
+    async function loadNotes() {
+      const subject = document.getElementById("filterSubject").value;
+      const q = document.getElementById("filterQuery").value.trim();
+
+      try {
+        const data = await SkillSwapApp.api(`/notes?subject=${encodeURIComponent(subject)}&q=${encodeURIComponent(q)}`);
+        notes = data.notes || [];
+      } catch {
+        const demo = SkillSwapApp.parseJSON(localStorage.getItem(fallbackKey), null) || [
+          { id: 1, title: "Python Unit 3 Notes", subject: "Python", price: 45, sellerName: "Riya" },
+          { id: 2, title: "DBMS Quick Revision", subject: "DBMS", price: 50, sellerName: "Aarav" },
+          { id: 3, title: "Engineering Math Cheatsheet", subject: "Math", price: 30, sellerName: "Sneha" }
+        ];
+        localStorage.setItem(fallbackKey, JSON.stringify(demo));
+        notes = demo.filter((n) => (!subject || n.subject === subject) && (!q || `${n.title} ${n.subject}`.toLowerCase().includes(q.toLowerCase())));
+      }
+      renderNotes();
+    }
+
+    function renderNotes() {
+      if (!notes.length) {
+        notesGrid.innerHTML = '<p class="muted">No notes found.</p>';
+        return;
+      }
+
+      notesGrid.innerHTML = notes.map((n) => `
+        <article class="card">
+          <h3>${n.title}</h3>
+          <p class="muted">Subject: ${n.subject}</p>
+          <p class="muted">Seller: ${n.sellerName || "User"}</p>
+          <p style="margin:.2rem 0 .6rem;"><strong>Rs ${n.price}</strong></p>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+            <button class="btn btn-gold" data-buy="${n.id}" type="button">Buy (Mock)</button>
+            <button class="btn btn-outline" data-view="${n.id}" type="button">View</button>
+          </div>
+        </article>
+      `).join("");
+
+      notesGrid.querySelectorAll("button[data-buy]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const noteId = Number(btn.getAttribute("data-buy"));
+          try {
+            if (!user.id) throw new Error("no id");
+            await SkillSwapApp.api(`/notes/${noteId}/buy`, {
+              method: "POST",
+              body: JSON.stringify({ buyerId: user.id })
+            });
+          } catch {
+            // mock success
+          }
+          btn.textContent = "Purchased";
+          btn.disabled = true;
+          toast("Mock payment successful");
+        });
+      });
+
+      notesGrid.querySelectorAll("button[data-view]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const noteId = Number(btn.getAttribute("data-view"));
+          const note = notes.find((n) => Number(n.id) === noteId);
+          if (!note) return;
+          document.getElementById("modalTitle").textContent = note.title;
+          document.getElementById("modalSubject").textContent = `Subject: ${note.subject}`;
+          document.getElementById("modalPrice").textContent = `Price: Rs ${note.price}`;
+          document.getElementById("modalFile").textContent = `File: ${note.fileName || "Uploaded Note"}`;
+          previewModal.style.display = "flex";
+        });
+      });
+    }
+
+    async function uploadNote() {
+      const title = document.getElementById("noteTitle").value.trim();
+      const subject = document.getElementById("noteSubject").value.trim();
+      const price = Number(document.getElementById("notePrice").value);
+      const file = document.getElementById("noteFile").files[0];
+
+      if (!title || !subject || Number.isNaN(price)) {
+        alert("Fill title, subject and price.");
+        return;
+      }
+
+      const payload = { title, subject, price, fileName: file ? file.name : "uploaded-note.pdf", sellerId: user.id || 0, sellerName: user.username || "User" };
+
+      try {
+        await SkillSwapApp.api("/notes", { method: "POST", body: JSON.stringify(payload) });
+      } catch {
+        const demo = SkillSwapApp.parseJSON(localStorage.getItem(fallbackKey), []);
+        demo.unshift({ id: Date.now(), ...payload });
+        localStorage.setItem(fallbackKey, JSON.stringify(demo));
+      }
+
+      ["noteTitle", "noteSubject", "notePrice", "noteFile"].forEach((id) => document.getElementById(id).value = "");
+      toast("Note uploaded successfully");
+      loadNotes();
+    }
+
+    document.getElementById("applyFilter").addEventListener("click", loadNotes);
+    document.getElementById("uploadNote").addEventListener("click", uploadNote);
+    document.getElementById("closeModal").addEventListener("click", () => { previewModal.style.display = "none"; });
+    previewModal.addEventListener("click", (event) => { if (event.target === previewModal) previewModal.style.display = "none"; });
+
+    document.addEventListener("skillswap-search", (event) => {
+      document.getElementById("filterQuery").value = event.detail;
+      loadNotes();
+    });
+
+    loadNotes();
+  </script>
+</body>
+</html>

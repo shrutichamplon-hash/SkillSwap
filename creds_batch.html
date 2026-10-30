@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap | Credits & Badges</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="app-layout.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <a class="brand" href="index.html">Skill<span>Swap</span></a>
+      <section class="user-card">
+        <p class="user-label">USERNAME</p>
+        <p class="user-name" id="sidebarName">user</p>
+        <p class="user-meta" id="sidebarMeta">Branch | Year</p>
+      </section>
+      <nav class="nav">
+        <a href="dash.html" data-page="dash">Dashboard</a>
+        <a href="connection.html" data-page="connections">Connections</a>
+        <a href="meetings.html" data-page="meetings">Meetings</a>
+        <a href="Ai_match.html" data-page="ai">AI Matching</a>
+        <a href="creds_batch.html" data-page="credits">Credits & Badges</a>
+        <a href="leaderboard.html" data-page="leaderboard">Leaderboard</a>
+        <a href="notes.html" data-page="notes">Notes Market</a>
+        <a href="consult.html" data-page="consult">Hire Consultant</a>
+        <a href="profile.html" data-page="profile">Edit Profile</a>
+      </nav>
+      <div class="spacer"></div>
+      <button id="logoutBtn" class="btn btn-gold" type="button">Logout</button>
+    </aside>
+
+    <main class="main-area">
+      <section class="topbar">
+        <input id="topSearch" class="search" type="search" placeholder="Search activity..." />
+        <div class="top-chip">Notifications: 2</div>
+        <div id="topProfileName" class="top-chip">Profile</div>
+      </section>
+
+      <section class="panel hero">
+        <h1>Credits & Badge System</h1>
+        <p>Track progress, badges, and redeem rewards with earned credits.</p>
+      </section>
+
+      <section class="grid">
+        <article class="panel">
+          <h3 style="margin:0;">Total Credits</h3>
+          <p id="totalCredits" style="font-size:2rem;margin:.2rem 0;color:#ffe089;">0</p>
+          <p class="muted">Current Badge: <span id="badgeName" class="badge warn">Beginner</span></p>
+        </article>
+        <article class="panel">
+          <h3 style="margin:0;">Next Badge Progress</h3>
+          <p class="muted" id="nextBadgeText">Keep helping peers to level up.</p>
+          <div class="progress"><span id="badgeProgress" style="width:20%;"></span></div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h2 style="margin:0 0 .6rem;font-family:Sora,sans-serif;">Activity History</h2>
+        <table class="table">
+          <thead><tr><th>Date</th><th>Activity</th><th>Credits</th></tr></thead>
+          <tbody id="historyRows"></tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h2 style="margin:0 0 .6rem;font-family:Sora,sans-serif;">Redeem Rewards</h2>
+        <div id="couponGrid" class="grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app-layout.js"></script>
+  <script>
+    const user = SkillSwapApp.requireAuth();
+    if (!user) throw new Error("Auth required");
+    SkillSwapApp.setShell(user, "credits");
+
+    const coupons = [
+      { id: 1, title: "10% Electronics Coupon", cost: 120 },
+      { id: 2, title: "Beauty/Makeup Voucher", cost: 90 },
+      { id: 3, title: "Stationery Kit Discount", cost: 60 },
+      { id: 4, title: "Online Course Coupon", cost: 160 }
+    ];
+
+    let creditsData = null;
+
+    function badgeFromCredits(total) {
+      if (total >= 600) return "Mentor";
+      if (total >= 350) return "Expert";
+      if (total >= 180) return "Intermediate";
+      return "Beginner";
+    }
+
+    function nextMilestone(total) {
+      const marks = [180, 350, 600];
+      const next = marks.find((m) => total < m);
+      if (!next) return { text: "Top tier unlocked", pct: 100 };
+      const prev = marks.filter((m) => m < next).pop() || 0;
+      const pct = Math.max(0, Math.min(100, Math.round(((total - prev) / (next - prev)) * 100)));
+      return { text: `${next - total} credits to reach ${badgeFromCredits(next)} badge`, pct };
+    }
+
+    async function loadCredits() {
+      try {
+        if (!user.id) throw new Error("no id");
+        const data = await SkillSwapApp.api(`/credits/${user.id}`);
+        creditsData = data;
+      } catch {
+        const key = `skillswap_credit_demo_${String(user.username).toLowerCase()}`;
+        creditsData = SkillSwapApp.parseJSON(localStorage.getItem(key), null) || {
+          totalCredits: 140,
+          history: [
+            { action: "Completed React session", credits: 30, createdAt: new Date().toISOString() },
+            { action: "Helped peer with DBMS", credits: 20, createdAt: new Date(Date.now() - 86400000).toISOString() },
+            { action: "Received 5-star review", credits: 10, createdAt: new Date(Date.now() - 172800000).toISOString() }
+          ]
+        };
+        localStorage.setItem(key, JSON.stringify(creditsData));
+      }
+      renderCredits();
+    }
+
+    function renderCredits() {
+      const total = creditsData.totalCredits || 0;
+      const badge = badgeFromCredits(total);
+      const next = nextMilestone(total);
+
+      document.getElementById("totalCredits").textContent = total;
+      document.getElementById("badgeName").textContent = badge;
+      document.getElementById("nextBadgeText").textContent = next.text;
+      document.getElementById("badgeProgress").style.width = `${next.pct}%`;
+
+      const historyRows = document.getElementById("historyRows");
+      historyRows.innerHTML = (creditsData.history || []).map((h) => `
+        <tr>
+          <td>${new Date(h.createdAt).toLocaleDateString()}</td>
+          <td>${h.action}</td>
+          <td>+${h.credits}</td>
+        </tr>
+      `).join("");
+
+      const couponGrid = document.getElementById("couponGrid");
+      couponGrid.innerHTML = coupons.map((c) => `
+        <article class="card">
+          <h3>${c.title}</h3>
+          <p class="muted">Cost: ${c.cost} credits</p>
+          <button class="btn ${total >= c.cost ? "btn-gold" : "btn-outline"}" data-redeem="${c.id}" ${total < c.cost ? "disabled" : ""}>Redeem</button>
+        </article>
+      `).join("");
+
+      couponGrid.querySelectorAll("button[data-redeem]").forEach((btn) => {
+        btn.addEventListener("click", () => redeemCoupon(Number(btn.getAttribute("data-redeem"))));
+      });
+    }
+
+    async function redeemCoupon(couponId) {
+      const coupon = coupons.find((c) => c.id === couponId);
+      if (!coupon) return;
+
+      try {
+        if (!user.id) throw new Error("no id");
+        const updated = await SkillSwapApp.api("/credits/redeem", {
+          method: "POST",
+          body: JSON.stringify({ userId: user.id, couponTitle: coupon.title, cost: coupon.cost })
+        });
+        creditsData = updated;
+      } catch {
+        if ((creditsData.totalCredits || 0) < coupon.cost) return;
+        creditsData.totalCredits -= coupon.cost;
+        creditsData.history.unshift({ action: `Redeemed: ${coupon.title}`, credits: -coupon.cost, createdAt: new Date().toISOString() });
+        const key = `skillswap_credit_demo_${String(user.username).toLowerCase()}`;
+        localStorage.setItem(key, JSON.stringify(creditsData));
+      }
+      renderCredits();
+      alert(`Redeemed: ${coupon.title}`);
+    }
+
+    document.addEventListener("skillswap-search", (event) => {
+      const keyword = event.detail;
+      const rows = [...document.querySelectorAll("#historyRows tr")];
+      rows.forEach((r) => {
+        r.style.display = !keyword || r.textContent.toLowerCase().includes(keyword) ? "" : "none";
+      });
+    });
+
+    loadCredits();
+  </script>
+</body>
+</html>

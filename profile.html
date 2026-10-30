@@ -1,0 +1,1035 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap | Complete Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #020611;
+      --bg-2: #05183b;
+      --panel: rgba(9, 21, 48, 0.76);
+      --panel-2: rgba(7, 17, 38, 0.84);
+      --text: #e8eeff;
+      --muted: #99a7c8;
+      --gold: #f7cd45;
+      --blue: #67bfff;
+      --border: rgba(121, 158, 251, 0.26);
+      --ok: #2dd36f;
+      --warn: #f1c84c;
+      --bad: #f25f5c;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Outfit", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 12%, #0b2254 0%, transparent 34%),
+        radial-gradient(circle at 88% 14%, #0a1f4d 0%, transparent 34%),
+        linear-gradient(150deg, var(--bg-1), var(--bg-2));
+    }
+
+    .container {
+      width: min(1120px, 92%);
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .navbar {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 14px;
+      align-items: center;
+      padding: 0.85rem 1rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(6, 14, 34, 0.75);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      text-decoration: none;
+      color: var(--text);
+      font-family: "Orbitron", sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .brand span { color: var(--gold); }
+
+    .nav-mid {
+      color: #cad6f8;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 0.65rem;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 0.58rem 1rem;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s ease;
+      background: transparent;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #ffe27f, #ffc517);
+      color: #0a1530;
+      box-shadow: 0 0 20px rgba(247, 205, 69, 0.35);
+    }
+
+    .btn-outline {
+      border-color: rgba(247, 205, 69, 0.75);
+      color: #ffeaa0;
+      background: rgba(247, 205, 69, 0.08);
+    }
+
+    main { padding: 1.4rem 0 2.5rem; }
+
+    .grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .panel {
+      background: linear-gradient(170deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.15rem;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 16px 36px rgba(2, 9, 24, 0.48);
+    }
+
+    .panel h2 {
+      margin: 0 0 0.25rem;
+      font-family: "Orbitron", sans-serif;
+      font-size: 1.1rem;
+    }
+
+    .muted {
+      margin: 0 0 1rem;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.95rem;
+    }
+
+    .credentials { grid-column: span 12; }
+    .bio { grid-column: span 12; }
+    .skills { grid-column: span 7; }
+    .verify { grid-column: span 5; }
+
+    .profile-hero {
+      margin-bottom: 1rem;
+      border: 1px solid rgba(135, 170, 251, 0.3);
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(8, 17, 40, 0.75);
+      position: relative;
+    }
+
+    .cover-preview {
+      width: 100%;
+      height: 165px;
+      object-fit: cover;
+      display: block;
+      background: linear-gradient(140deg, #234894, #1a2f62 60%, #0f1c3f);
+    }
+
+    .avatar-wrap {
+      position: absolute;
+      left: 1.2rem;
+      bottom: -38px;
+      width: 116px;
+      height: 116px;
+      border-radius: 50%;
+      border: 4px solid rgba(237, 244, 255, 0.92);
+      overflow: hidden;
+      background: #0d1f49;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    .avatar-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .profile-upload-row {
+      margin-top: 50px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.8rem;
+    }
+
+    .field {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      color: #bed0f7;
+      font-size: 0.89rem;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(141, 173, 250, 0.3);
+      background: rgba(8, 18, 42, 0.82);
+      color: var(--text);
+      padding: 0.72rem 0.85rem;
+      font: inherit;
+      outline: none;
+      transition: 0.22s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(247, 205, 69, 0.8);
+      box-shadow: 0 0 0 3px rgba(247, 205, 69, 0.18);
+    }
+
+    textarea { min-height: 90px; resize: vertical; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr auto;
+      gap: 0.55rem;
+      align-items: end;
+      margin-bottom: 0.7rem;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      min-height: 34px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(102, 142, 248, 0.46);
+      background: rgba(102, 142, 248, 0.16);
+      color: #e9f1ff;
+      font-size: 0.86rem;
+      transition: 0.2s ease;
+    }
+
+    .chip:hover {
+      transform: translateY(-1px);
+      border-color: rgba(247, 205, 69, 0.65);
+      box-shadow: 0 0 14px rgba(247, 205, 69, 0.24);
+    }
+
+    .chip button {
+      border: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(245, 95, 95, 0.22);
+      color: #ffd7d7;
+      cursor: pointer;
+      line-height: 1;
+      font-size: 0.78rem;
+    }
+
+    .status-legend {
+      display: flex;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.65rem;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 0.3rem 0.55rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+
+    .ok { color: #c9ffd9; background: rgba(45, 211, 111, 0.18); border-color: rgba(45, 211, 111, 0.55); }
+    .warn { color: #fff0c5; background: rgba(241, 200, 76, 0.17); border-color: rgba(241, 200, 76, 0.5); }
+    .bad { color: #ffd1d1; background: rgba(242, 95, 92, 0.18); border-color: rgba(242, 95, 92, 0.55); }
+
+    .verify-list {
+      margin-top: 0.8rem;
+      display: grid;
+      gap: 0.65rem;
+      max-height: 280px;
+      overflow: auto;
+      padding-right: 0.2rem;
+    }
+
+    .verify-item {
+      border: 1px solid rgba(117, 151, 238, 0.34);
+      border-radius: 14px;
+      padding: 0.75rem;
+      background: rgba(8, 17, 38, 0.68);
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .verify-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .verify-actions {
+      display: flex;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    .small-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(123, 160, 251, 0.5);
+      padding: 0.3rem 0.62rem;
+      color: #d9e5ff;
+      background: rgba(95, 138, 252, 0.16);
+      text-decoration: none;
+      font-size: 0.8rem;
+    }
+
+    .small-btn:hover {
+      border-color: rgba(247, 205, 69, 0.72);
+      color: #ffe99d;
+    }
+
+    .footer-actions {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 980px) {
+      .navbar { grid-template-columns: 1fr; text-align: center; border-radius: 18px; }
+      .nav-actions { justify-content: center; }
+      .skills, .verify { grid-column: span 12; }
+    }
+
+    @media (max-width: 680px) {
+      .fields { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 1fr; }
+      .profile-upload-row { grid-template-columns: 1fr; margin-top: 56px; }
+      .footer-actions { justify-content: stretch; }
+      .footer-actions .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="navbar">
+      <a class="brand" href="index.html">Skill<span>Swap</span></a>
+      <div class="nav-mid">Complete your profile to unlock better matches</div>
+      <div class="nav-actions">
+        <a href="dash.html" class="btn btn-outline">Dashboard</a>
+        <button type="button" id="logoutBtn" class="btn btn-gold">Logout</button>
+      </div>
+    </nav>
+
+    <main>
+      <div class="grid">
+        <section class="panel credentials">
+          <div class="profile-hero">
+            <img id="coverPreview" class="cover-preview" alt="Profile cover" />
+            <div class="avatar-wrap">
+              <img id="avatarPreview" class="avatar-preview" alt="Profile avatar" />
+            </div>
+          </div>
+
+          <div class="profile-upload-row">
+            <div class="field">
+              <label for="coverUpload">Cover Image</label>
+              <input id="coverUpload" type="file" accept="image/*" />
+            </div>
+            <div class="field">
+              <label for="avatarUpload">Profile Picture</label>
+              <input id="avatarUpload" type="file" accept="image/*" />
+            </div>
+          </div>
+
+          <h2>1) Academic Credentials</h2>
+          <p class="muted">Fill the remaining profile details so matching works better by branch and year.</p>
+          <div class="fields">
+            <div class="field">
+              <label for="collegeName">College Name</label>
+              <input id="collegeName" type="text" placeholder="Enter college name" required />
+            </div>
+            <div class="field">
+              <label for="collegeLocated">College Located</label>
+              <input id="collegeLocated" type="text" placeholder="City / State" required />
+            </div>
+            <div class="field">
+              <label for="yearStudy">Year of Study</label>
+              <select id="yearStudy" required>
+                <option value="" selected disabled>Select year</option>
+                <option>1st Year</option>
+                <option>2nd Year</option>
+                <option>3rd Year</option>
+                <option>4th Year</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="branch">Branch</label>
+              <select id="branch" required>
+                <option value="" selected disabled>Select branch</option>
+                <option>Computer Science Engineering</option>
+                <option>Information Technology</option>
+                <option>Electronics and Communication Engineering</option>
+                <option>Electrical Engineering</option>
+                <option>Mechanical Engineering</option>
+                <option>Civil Engineering</option>
+                <option>Chemical Engineering</option>
+                <option>Aerospace Engineering</option>
+                <option>Biotechnology Engineering</option>
+                <option>Artificial Intelligence and Data Science</option>
+                <option>Robotics and Automation</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel bio">
+          <h2>2) Bio Section</h2>
+          <p class="muted">Write a short intro that helps peers understand your interests and strengths.</p>
+          <div class="field full">
+            <label for="bioText">Short Description</label>
+            <textarea id="bioText" maxlength="350" placeholder="I love building web apps, mentoring juniors, and learning product design."></textarea>
+          </div>
+        </section>
+
+        <section class="panel skills">
+          <h2>3) Skills Section (Main Feature)</h2>
+          <p class="muted">Add skills you can teach with levels, and skills you want to learn.</p>
+
+          <h3>Skills You Teach</h3>
+          <div class="row">
+            <div class="field">
+              <label for="teachSkill">Skill</label>
+              <input id="teachSkill" type="text" placeholder="e.g., Java, UI Design" />
+            </div>
+            <div class="field">
+              <label for="teachLevel">Level</label>
+              <select id="teachLevel">
+                <option>Beginner</option>
+                <option selected>Intermediate</option>
+                <option>Advanced</option>
+              </select>
+            </div>
+            <button type="button" id="addTeachSkill" class="btn btn-gold" onclick="window.__addTeachSkill && window.__addTeachSkill()">+ Add Skill</button>
+          </div>
+          <p id="teachSkillMsg" class="muted" style="margin:0 0 0.5rem;"></p>
+          <div id="teachSkillsList" class="chips"></div>
+
+          <h3>Skills You Want to Learn</h3>
+          <div class="row">
+            <div class="field" style="grid-column: span 2;">
+              <label for="learnSkill">Skill</label>
+              <input id="learnSkill" type="text" placeholder="e.g., React, Data Structures" />
+            </div>
+            <button type="button" id="addLearnSkill" class="btn btn-gold" onclick="window.__addLearnSkill && window.__addLearnSkill()">+ Add Skill</button>
+          </div>
+          <p id="learnSkillMsg" class="muted" style="margin:0 0 0.5rem;"></p>
+          <div id="learnSkillsList" class="chips"></div>
+        </section>
+
+        <section class="panel verify">
+          <h2>Verify Your Skills</h2>
+
+          <div class="field">
+            <label for="verifySkill">Select Skill</label>
+            <select id="verifySkill"><option value="">Choose skill</option></select>
+          </div>
+          <div class="field">
+            <label for="certificateFile">Certificate (PDF/Image)</label>
+            <input id="certificateFile" type="file" accept=".pdf,image/*" />
+          </div>
+          <div class="field">
+            <label for="portfolioLink">Portfolio Link (GitHub / Drive / etc.)</label>
+            <input id="portfolioLink" type="url" placeholder="https://..." />
+          </div>
+          <div class="field">
+            <label for="verifyDescription">Small Description</label>
+            <textarea id="verifyDescription" placeholder="Explain what this certificate/portfolio proves."></textarea>
+          </div>
+          <button type="button" id="uploadVerification" class="btn btn-outline" onclick="window.__uploadVerification && window.__uploadVerification()">Upload & Verify</button>
+          <p id="verifyMsg" class="muted" style="margin:0.45rem 0 0.5rem;"></p>
+
+          <div id="verificationList" class="verify-list"></div>
+        </section>
+      </div>
+
+      <div class="footer-actions">
+        <a href="index.html" class="btn btn-outline">Back To Home</a>
+        <button type="button" id="saveProfileBtn" class="btn btn-gold">Save Profile & Open Dashboard</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const logoutBtn = document.getElementById("logoutBtn");
+    const addTeachSkillBtn = document.getElementById("addTeachSkill");
+    const addLearnSkillBtn = document.getElementById("addLearnSkill");
+    const uploadVerificationBtn = document.getElementById("uploadVerification");
+    const saveProfileBtn = document.getElementById("saveProfileBtn");
+
+    const teachInput = document.getElementById("teachSkill");
+    const teachLevel = document.getElementById("teachLevel");
+    const learnInput = document.getElementById("learnSkill");
+    const teachSkillsList = document.getElementById("teachSkillsList");
+    const learnSkillsList = document.getElementById("learnSkillsList");
+    const verifySkill = document.getElementById("verifySkill");
+    const verificationList = document.getElementById("verificationList");
+    const teachSkillMsg = document.getElementById("teachSkillMsg");
+    const learnSkillMsg = document.getElementById("learnSkillMsg");
+    const verifyMsg = document.getElementById("verifyMsg");
+    const coverPreview = document.getElementById("coverPreview");
+    const avatarPreview = document.getElementById("avatarPreview");
+    const coverUpload = document.getElementById("coverUpload");
+    const avatarUpload = document.getElementById("avatarUpload");
+
+    // Safe localStorage wrapper (handles environments where access may throw)
+    const safeStorage = (() => {
+      const fallback = {}; // in-memory fallback
+      const isSupported = () => {
+        try {
+          const testKey = "__skillswap_test";
+          window.localStorage.setItem(testKey, testKey);
+          window.localStorage.removeItem(testKey);
+          return true;
+        } catch {
+          return false;
+        }
+      };
+
+      return {
+        getItem(key) {
+          try {
+            if (isSupported()) return window.localStorage.getItem(key);
+          } catch {
+            // ignore
+          }
+          return Object.prototype.hasOwnProperty.call(fallback, key) ? fallback[key] : null;
+        },
+        setItem(key, value) {
+          try {
+            if (isSupported()) {
+              window.localStorage.setItem(key, value);
+              return;
+            }
+          } catch {
+            // ignore
+          }
+          fallback[key] = value;
+        },
+        removeItem(key) {
+          try {
+            if (isSupported()) {
+              window.localStorage.removeItem(key);
+              return;
+            }
+          } catch {
+            // ignore
+          }
+          delete fallback[key];
+        },
+      };
+    })();
+
+    let currentUser = null;
+    const API_BASE = "http://localhost:4000/api";
+    let profileStorageKey = "skillswap_profile";
+    let verificationStorageKey = "skillswap_verifications";
+    let profileImageData = "";
+    let coverImageData = "";
+
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const isNetworkError = (error) => Boolean(
+      error && (
+        error.name === "TypeError" ||
+        /Failed to fetch|NetworkError|ERR_CONNECTION_REFUSED|ECONNREFUSED/i.test(error.message || "")
+      )
+    );
+
+    async function fetchWithRetry(url, options = {}, retries = 2, delayMs = 350) {
+      let lastError = null;
+      for (let attempt = 0; attempt <= retries; attempt += 1) {
+        try {
+          return await fetch(url, options);
+        } catch (error) {
+          lastError = error;
+          if (attempt < retries && isNetworkError(error)) {
+            await sleep(delayMs * (attempt + 1));
+            continue;
+          }
+          throw error;
+        }
+      }
+      throw lastError || new Error("Request failed");
+    }
+
+    const defaultCover = "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80";
+    const defaultAvatar = "https://i.pravatar.cc/280?img=47";
+
+    function safeParse(raw, fallback) {
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return fallback;
+      }
+    }
+
+    if (coverPreview) coverPreview.src = defaultCover;
+    if (avatarPreview) avatarPreview.src = defaultAvatar;
+
+    try {
+      currentUser = JSON.parse(safeStorage.getItem("skillswap_current_user") || "null");
+    } catch {
+      currentUser = null;
+    }
+
+    let teachSkills = [];
+    let learnSkills = [];
+    let verifications = [];
+
+    async function resolveCurrentUserId() {
+      if (currentUser && currentUser.id) {
+        return Number(currentUser.id);
+      }
+      return null;
+    }
+
+    async function hydrateRemoteProfile() {
+      const resolvedUserId = await resolveCurrentUserId();
+      if (!resolvedUserId) return hydrateSavedData();
+
+      try {
+        const response = await fetchWithRetry(`${API_BASE}/profile/${resolvedUserId}`);
+        if (!response.ok) throw new Error("Profile not found");
+        const data = await response.json();
+
+        const profile = data.profile || {};
+        document.getElementById("collegeName").value = profile.collegeName || "";
+        document.getElementById("collegeLocated").value = profile.collegeLocated || "";
+        document.getElementById("yearStudy").value = profile.yearStudy || "";
+        document.getElementById("branch").value = profile.branch || "";
+        document.getElementById("bioText").value = profile.bioText || "";
+
+        teachSkills = (data.teachSkills || []).map((item) => ({ skill: item.skill, level: item.level || "Intermediate" }));
+        learnSkills = data.learnSkills || [];
+        verifications = data.verifications || [];
+        coverImageData = profile.coverImageData || "";
+        profileImageData = profile.profileImageData || "";
+
+        if (coverPreview) coverPreview.src = coverImageData || defaultCover;
+        if (avatarPreview) avatarPreview.src = profileImageData || defaultAvatar;
+
+        renderTeachSkills();
+        renderLearnSkills();
+        populateVerifySkillSelect();
+        renderVerifications();
+      } catch {
+        hydrateSavedData();
+      }
+    }
+
+    if (!currentUser || !currentUser.username || !currentUser.id) {
+      safeStorage.removeItem("skillswap_current_user");
+      window.location.href = "login.html";
+    } else {
+      const key = currentUser.username.toLowerCase();
+      profileStorageKey = `skillswap_profile_${key}`;
+      verificationStorageKey = `skillswap_verifications_${key}`;
+      hydrateRemoteProfile();
+    }
+
+    logoutBtn.addEventListener("click", () => {
+      safeStorage.removeItem("skillswap_current_user");
+      window.location.href = "index.html";
+    });
+
+    function hydrateSavedData() {
+      const savedProfile = safeStorage.getItem(profileStorageKey);
+      const savedVerifications = safeStorage.getItem(verificationStorageKey);
+
+      teachSkills = [];
+      learnSkills = [];
+      verifications = [];
+
+      if (savedProfile) {
+        const profile = safeParse(savedProfile, {});
+        document.getElementById("collegeName").value = profile.collegeName || "";
+        document.getElementById("collegeLocated").value = profile.collegeLocated || "";
+        document.getElementById("yearStudy").value = profile.yearStudy || "";
+        document.getElementById("branch").value = profile.branch || "";
+        document.getElementById("bioText").value = profile.bioText || "";
+        teachSkills = profile.teachSkills || [];
+        learnSkills = profile.learnSkills || [];
+        coverImageData = profile.coverImageData || "";
+        profileImageData = profile.profileImageData || "";
+        if (coverPreview) coverPreview.src = coverImageData || defaultCover;
+        if (avatarPreview) avatarPreview.src = profileImageData || defaultAvatar;
+      } else if (currentUser?.username) {
+        const userLabel = currentUser.username;
+        document.getElementById("bioText").value = `${userLabel} is excited to teach and learn on SkillSwap.`;
+        if (coverPreview) coverPreview.src = defaultCover;
+        if (avatarPreview) avatarPreview.src = defaultAvatar;
+      }
+
+      if (savedVerifications) {
+        verifications = safeParse(savedVerifications, []);
+      }
+
+      renderTeachSkills();
+      renderLearnSkills();
+      populateVerifySkillSelect();
+      renderVerifications();
+    }
+
+    function normalizeSkill(value) {
+      return value.trim().replace(/\s+/g, " ");
+    }
+
+    function showMsg(el, text, isError = false) {
+      el.textContent = text;
+      el.style.color = isError ? "#ffb3b3" : "#9dd8ff";
+      if (text) {
+        setTimeout(() => {
+          if (el.textContent === text) el.textContent = "";
+        }, 2200);
+      }
+    }
+
+    function renderTeachSkills() {
+      teachSkillsList.innerHTML = "";
+      teachSkills.forEach((item, idx) => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.innerHTML = `<span>${item.skill} - ${item.level}</span><button type="button" data-idx="${idx}" aria-label="Delete teach skill">x</button>`;
+        teachSkillsList.appendChild(chip);
+      });
+
+      teachSkillsList.querySelectorAll("button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const i = Number(btn.getAttribute("data-idx"));
+          teachSkills.splice(i, 1);
+          renderTeachSkills();
+          populateVerifySkillSelect();
+        });
+      });
+    }
+
+    function renderLearnSkills() {
+      learnSkillsList.innerHTML = "";
+      learnSkills.forEach((item, idx) => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.innerHTML = `<span>${item}</span><button type="button" data-idx="${idx}" aria-label="Delete learn skill">x</button>`;
+        learnSkillsList.appendChild(chip);
+      });
+
+      learnSkillsList.querySelectorAll("button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const i = Number(btn.getAttribute("data-idx"));
+          learnSkills.splice(i, 1);
+          renderLearnSkills();
+        });
+      });
+    }
+
+    function populateVerifySkillSelect() {
+      const current = verifySkill.value;
+      verifySkill.innerHTML = '<option value="">Choose skill</option>';
+      teachSkills.forEach((item) => {
+        const option = document.createElement("option");
+        option.value = item.skill;
+        option.textContent = `${item.skill} (${item.level})`;
+        verifySkill.appendChild(option);
+      });
+      if ([...verifySkill.options].some((o) => o.value === current)) {
+        verifySkill.value = current;
+      }
+    }
+
+    function statusClass(status) {
+      if (status === "Verified") return "ok";
+      if (status === "Pending") return "warn";
+      return "bad";
+    }
+
+    function renderVerifications() {
+      verificationList.innerHTML = "";
+      if (!verifications.length) {
+        verificationList.innerHTML = '<p class="muted">No verification added yet.</p>';
+        return;
+      }
+
+      verifications.forEach((item, idx) => {
+        const row = document.createElement("div");
+        row.className = "verify-item";
+        row.innerHTML = `
+          <div class="verify-head">
+            <strong>${item.skill}</strong>
+            <span class="badge ${statusClass(item.status)}">${item.status}</span>
+          </div>
+          <div>${item.description || "No description provided."}</div>
+          <div class="verify-actions">
+            ${item.fileDataUrl ? `<a class="small-btn" href="${item.fileDataUrl}" target="_blank" rel="noopener">View Certificate</a>` : ""}
+            ${item.portfolioLink ? `<a class="small-btn" href="${item.portfolioLink}" target="_blank" rel="noopener">View Portfolio</a>` : ""}
+            <button class="small-btn" type="button" data-remove="${idx}">Delete</button>
+          </div>
+          <small style="color:#a3b2d3;">Verified Skill Badge ${item.status === "Verified" ? "enabled" : "not enabled"}</small>
+        `;
+        verificationList.appendChild(row);
+      });
+
+      verificationList.querySelectorAll("button[data-remove]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const i = Number(btn.getAttribute("data-remove"));
+          verifications.splice(i, 1);
+          renderVerifications();
+        });
+      });
+    }
+
+    if (addTeachSkillBtn) {
+      addTeachSkillBtn.addEventListener("click", () => {
+        addTeachSkill();
+      });
+    }
+
+    function addTeachSkill() {
+      const skill = normalizeSkill(teachInput.value);
+      if (!skill) {
+        showMsg(teachSkillMsg, "Enter a skill first.", true);
+        return;
+      }
+      const duplicate = teachSkills.some((item) => item.skill.toLowerCase() === skill.toLowerCase());
+      if (duplicate) {
+        showMsg(teachSkillMsg, "This teach skill already exists.", true);
+        return;
+      }
+      teachSkills.push({ skill, level: teachLevel.value });
+      teachInput.value = "";
+      renderTeachSkills();
+      populateVerifySkillSelect();
+      showMsg(teachSkillMsg, "Skill added.");
+    }
+
+    if (addLearnSkillBtn) {
+      addLearnSkillBtn.addEventListener("click", () => {
+        addLearnSkill();
+      });
+    }
+
+    function addLearnSkill() {
+      const skill = normalizeSkill(learnInput.value);
+      if (!skill) {
+        showMsg(learnSkillMsg, "Enter a skill first.", true);
+        return;
+      }
+      const duplicate = learnSkills.some((item) => item.toLowerCase() === skill.toLowerCase());
+      if (duplicate) {
+        showMsg(learnSkillMsg, "This learn skill already exists.", true);
+        return;
+      }
+      learnSkills.push(skill);
+      learnInput.value = "";
+      renderLearnSkills();
+      showMsg(learnSkillMsg, "Skill added.");
+    }
+
+    if (teachInput) {
+      teachInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          addTeachSkill();
+        }
+      });
+    }
+
+    if (learnInput) {
+      learnInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          addLearnSkill();
+        }
+      });
+    }
+
+    window.__addTeachSkill = addTeachSkill;
+    window.__addLearnSkill = addLearnSkill;
+
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (coverUpload) {
+      coverUpload.addEventListener("change", async () => {
+        const file = coverUpload.files[0];
+        if (!file) return;
+        coverImageData = await readFileAsDataURL(file);
+        if (coverPreview) coverPreview.src = coverImageData;
+      });
+    }
+
+    if (avatarUpload) {
+      avatarUpload.addEventListener("change", async () => {
+        const file = avatarUpload.files[0];
+        if (!file) return;
+        profileImageData = await readFileAsDataURL(file);
+        if (avatarPreview) avatarPreview.src = profileImageData;
+      });
+    }
+
+    async function uploadVerification() {
+      const skill = verifySkill.value;
+      const file = document.getElementById("certificateFile").files[0];
+      const portfolioLink = document.getElementById("portfolioLink").value.trim();
+      const description = document.getElementById("verifyDescription").value.trim();
+
+      if (!skill) {
+        showMsg(verifyMsg, "Select a skill first.", true);
+        return;
+      }
+
+      let fileDataUrl = "";
+      if (file) {
+        fileDataUrl = await readFileAsDataURL(file);
+      }
+
+      let status = "Not verified";
+      if (file || portfolioLink) {
+        status = "Verified";
+      } else if (description) {
+        status = "Pending";
+      }
+
+      verifications.push({
+        skill,
+        fileName: file ? file.name : "",
+        fileDataUrl,
+        portfolioLink,
+        description,
+        status
+      });
+
+      document.getElementById("certificateFile").value = "";
+      document.getElementById("portfolioLink").value = "";
+      document.getElementById("verifyDescription").value = "";
+
+      renderVerifications();
+      showMsg(verifyMsg, "Verification added.");
+    }
+
+    if (uploadVerificationBtn) {
+      uploadVerificationBtn.addEventListener("click", uploadVerification);
+    }
+    window.__uploadVerification = uploadVerification;
+
+    saveProfileBtn.addEventListener("click", async () => {
+      const resolvedUserId = await resolveCurrentUserId();
+      const profileData = {
+        username: currentUser?.username || "User",
+        collegeName: document.getElementById("collegeName").value.trim(),
+        collegeLocated: document.getElementById("collegeLocated").value.trim(),
+        yearStudy: document.getElementById("yearStudy").value,
+        branch: document.getElementById("branch").value,
+        bioText: document.getElementById("bioText").value.trim(),
+        profileImageData,
+        coverImageData,
+        teachSkills,
+        learnSkills
+      };
+
+      if (!profileData.collegeName || !profileData.collegeLocated || !profileData.yearStudy || !profileData.branch) {
+        alert("Please complete college details, year, and branch before continuing.");
+        return;
+      }
+
+      if (resolvedUserId) {
+        try {
+          const response = await fetchWithRetry(`${API_BASE}/profile/save`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: resolvedUserId,
+              profile: profileData,
+              teachSkills,
+              learnSkills,
+              verifications
+            })
+          });
+          if (!response.ok) {
+            const payload = await response.json().catch(() => ({}));
+            throw new Error(payload.message || "Failed to save profile");
+          }
+        } catch (error) {
+          alert(error.message || "Could not save profile to MySQL. Please check the backend and try again.");
+          return;
+        }
+      } else {
+        alert("Unable to resolve your MySQL user. Please log in again and try saving.");
+        return;
+      }
+
+      window.location.href = "dash.html";
+    });
+
+    window.addEventListener("error", () => {
+      showMsg(teachSkillMsg, "A page error occurred. Please refresh once.", true);
+    });
+  </script>
+</body>
+</html>

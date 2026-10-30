@@ -1,0 +1,858 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap | Exchange Skills, Expand Horizons</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #020611;
+      --bg-2: #04122f;
+      --bg-3: #071b43;
+      --panel: rgba(7, 16, 36, 0.72);
+      --panel-strong: rgba(10, 20, 44, 0.84);
+      --text: #e7ecff;
+      --muted: #98a3c3;
+      --gold: #f8cc3f;
+      --gold-soft: #ffdf72;
+      --neon: #4cc9ff;
+      --border: rgba(140, 173, 255, 0.22);
+      --shadow-gold: 0 0 26px rgba(248, 204, 63, 0.42);
+      --shadow-blue: 0 0 24px rgba(76, 201, 255, 0.28);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: "Outfit", sans-serif;
+      background: radial-gradient(circle at 10% 10%, #081634 0%, transparent 34%),
+                  radial-gradient(circle at 85% 22%, #0a1b42 0%, transparent 44%),
+                  linear-gradient(150deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    canvas#particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.75;
+      pointer-events: none;
+    }
+
+    .container {
+      width: min(1120px, 92%);
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .navbar-wrap {
+      position: sticky;
+      top: 14px;
+      z-index: 10;
+      padding-top: 14px;
+    }
+
+    .navbar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 20px;
+      background: rgba(5, 13, 31, 0.68);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      border-radius: 999px;
+      padding: 0.85rem 1rem;
+      box-shadow: var(--shadow-blue);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: "Orbitron", sans-serif;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      font-size: 1.08rem;
+      white-space: nowrap;
+    }
+
+    .brand::before {
+      content: "⚡";
+      font-size: 0.9rem;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(248, 204, 63, 0.45);
+      color: var(--gold);
+      box-shadow: 0 0 14px rgba(248, 204, 63, 0.35);
+    }
+
+    .brand span { color: var(--gold); }
+
+    .menu {
+      display: flex;
+      gap: 0.7rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: #d2daf6;
+      padding: 0.55rem 0.9rem;
+      border-radius: 999px;
+      font-weight: 500;
+      border: 1px solid transparent;
+      transition: 0.25s ease;
+    }
+
+    .menu a:hover {
+      color: #fff;
+      border-color: rgba(248, 204, 63, 0.5);
+      background: rgba(248, 204, 63, 0.08);
+    }
+
+    .auth-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      text-decoration: none;
+      border-radius: 999px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-outline {
+      color: var(--gold-soft);
+      border-color: rgba(248, 204, 63, 0.75);
+      padding: 0.58rem 1.2rem;
+      background: rgba(248, 204, 63, 0.06);
+    }
+
+    .btn-outline:hover { box-shadow: var(--shadow-gold); }
+
+    .btn-gold {
+      color: #0a1024;
+      padding: 0.68rem 1.35rem;
+      background: linear-gradient(135deg, #ffd858, #ffbb00);
+      box-shadow: var(--shadow-gold);
+    }
+
+    .hero {
+      min-height: calc(100vh - 120px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+      padding: 4rem 0 2rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border: 1px solid rgba(248, 204, 63, 0.45);
+      color: var(--gold-soft);
+      background: rgba(248, 204, 63, 0.08);
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: "Orbitron", sans-serif;
+      font-size: clamp(2.1rem, 6.5vw, 4.6rem);
+      line-height: 1.02;
+      letter-spacing: 0.2px;
+    }
+
+    .hero h1 .accent {
+      color: var(--gold);
+      text-shadow: 0 0 26px rgba(248, 204, 63, 0.34);
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 530px;
+      font-size: 1.08rem;
+      line-height: 1.7;
+      margin: 1.3rem 0 1.8rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(90px, 1fr));
+      gap: 1rem;
+      max-width: 420px;
+    }
+
+    .stat {
+      background: rgba(9, 21, 48, 0.58);
+      border: 1px solid rgba(140, 173, 255, 0.18);
+      border-radius: 12px;
+      padding: 0.8rem;
+      text-align: center;
+      backdrop-filter: blur(6px);
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--gold);
+      font-family: "Orbitron", sans-serif;
+      font-size: 1.2rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .stat span {
+      color: #b1bbd8;
+      font-size: 0.9rem;
+    }
+
+    .globe-wrap {
+      display: grid;
+      place-items: center;
+      position: relative;
+      perspective: 1200px;
+    }
+
+    .globe-stage {
+      width: min(560px, 85vw);
+      aspect-ratio: 1;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 120ms linear;
+      will-change: transform;
+    }
+
+    .globe {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 1px solid rgba(155, 193, 255, 0.6);
+      box-shadow: inset -85px -64px 120px rgba(0, 0, 0, 0.75), inset 0 0 58px rgba(75, 140, 255, 0.35), 0 0 52px rgba(98, 168, 255, 0.38);
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+      transform: translateZ(20px);
+      will-change: transform;
+    }
+
+    .earth-track {
+      position: absolute;
+      inset: 0;
+      width: 200%;
+      height: 100%;
+      display: flex;
+      will-change: transform;
+      animation: earthScroll 34s linear infinite;
+      transform: translate3d(0, 0, 0);
+    }
+
+    .earth-panel {
+      width: 50%;
+      height: 100%;
+      flex: 0 0 50%;
+      background-image:
+        radial-gradient(circle at 72% 28%, rgba(255, 255, 255, 0.28), transparent 18%),
+        radial-gradient(circle at 30% 28%, rgba(110, 166, 255, 0.18), transparent 28%),
+        radial-gradient(circle at 50% 50%, rgba(9, 18, 45, 0.2), rgba(4, 10, 25, 0.96) 72%),
+        url("https://eoimages.gsfc.nasa.gov/images/imagerecords/79000/79765/dnb_land_ocean_ice.2012.3600x1800.jpg");
+      background-size: auto, auto, auto, 200% 100%;
+      background-position: center, center, center, 0% 52%;
+      background-repeat: no-repeat;
+      background-blend-mode: screen, screen, normal, normal;
+    }
+
+    .globe::before,
+    .globe::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+    }
+
+    .globe::before {
+      inset: -6%;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(148, 206, 255, 0.34), transparent 34%),
+        linear-gradient(115deg, transparent 22%, rgba(255, 255, 255, 0.08) 34%, transparent 48%);
+      mix-blend-mode: screen;
+      animation: sheen 11s ease-in-out infinite;
+    }
+
+    .globe::after {
+      background: radial-gradient(circle at 50% 110%, rgba(130, 190, 255, 0.42), rgba(3, 10, 25, 0.1) 54%, rgba(0, 0, 0, 0.74));
+      pointer-events: none;
+    }
+
+    .atmosphere {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 1px solid rgba(149, 207, 255, 0.6);
+      box-shadow: 0 0 26px rgba(142, 203, 255, 0.45), inset 0 0 24px rgba(142, 203, 255, 0.3);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .orbit,
+    .orbit.two,
+    .orbit.three {
+      position: absolute;
+      border-radius: 50%;
+      border: 1.2px solid rgba(245, 251, 255, 0.34);
+      width: 120%;
+      height: 34%;
+      filter: drop-shadow(0 0 6px rgba(255, 221, 132, 0.22));
+      animation: orbit 24s linear infinite;
+      z-index: 0;
+    }
+
+    .orbit { transform: rotate(10deg); }
+
+    .orbit.two {
+      width: 118%;
+      transform: rotate(72deg);
+      animation-duration: 30s;
+      opacity: 0.42;
+    }
+
+    .orbit.three {
+      width: 130%;
+      height: 40%;
+      transform: rotate(-48deg);
+      animation-duration: 38s;
+      opacity: 0.3;
+    }
+
+    .connectors {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.52;
+    }
+
+    .connectors path {
+      stroke: rgba(255, 221, 132, 0.38);
+      stroke-width: 1.3;
+      fill: none;
+      filter: drop-shadow(0 0 5px rgba(255, 208, 66, 0.22));
+      stroke-dasharray: 3 12;
+      animation: dash 18s linear infinite;
+    }
+
+    .section {
+      padding: 6rem 0;
+    }
+
+    .section-title {
+      font-family: "Orbitron", sans-serif;
+      font-size: clamp(1.7rem, 3.2vw, 2.8rem);
+      margin: 0 0 0.6rem;
+    }
+
+    .section-sub {
+      margin: 0;
+      color: var(--muted);
+      max-width: 760px;
+      line-height: 1.7;
+    }
+
+    .cards-track {
+      margin-top: 2rem;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(220px, 1fr));
+      gap: 1rem;
+      overflow: hidden;
+    }
+
+    .card {
+      background: linear-gradient(175deg, rgba(16, 30, 61, 0.78), rgba(6, 15, 35, 0.85));
+      border: 1px solid rgba(106, 147, 248, 0.28);
+      border-radius: 18px;
+      padding: 1.2rem;
+      min-height: 210px;
+      backdrop-filter: blur(9px);
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      animation: slideCards 10s ease-in-out infinite alternate;
+    }
+
+    .card:nth-child(2) { animation-delay: 0.6s; }
+    .card:nth-child(3) { animation-delay: 1.2s; }
+    .card:nth-child(4) { animation-delay: 1.8s; }
+
+    .card:hover {
+      transform: translateY(-8px) rotate(-1deg);
+      border-color: rgba(248, 204, 63, 0.65);
+      box-shadow: 0 16px 36px rgba(7, 17, 42, 0.55), var(--shadow-gold);
+    }
+
+    .icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 0.9rem;
+      color: #101a34;
+      background: linear-gradient(135deg, #ffe37d, #ffbe0b);
+      box-shadow: 0 8px 16px rgba(248, 204, 63, 0.32);
+    }
+
+    .icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: #101a34;
+      fill: none;
+      stroke-width: 2.1;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.09rem;
+      color: #f4f7ff;
+    }
+
+    .card p {
+      margin: 0;
+      color: #aeb8d7;
+      line-height: 1.6;
+      font-size: 0.97rem;
+    }
+
+    .about-panel {
+      margin-top: 2rem;
+      background: linear-gradient(170deg, rgba(11, 24, 54, 0.8), rgba(5, 12, 28, 0.9));
+      border: 1px solid rgba(125, 157, 244, 0.25);
+      border-radius: 20px;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 1.3rem;
+      align-items: stretch;
+    }
+
+    .about-panel ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .about-panel li {
+      border: 1px solid rgba(248, 204, 63, 0.26);
+      border-radius: 12px;
+      padding: 0.8rem 0.9rem;
+      color: #d7def6;
+      background: rgba(248, 204, 63, 0.05);
+    }
+
+    .about-note {
+      border-radius: 16px;
+      border: 1px solid rgba(98, 142, 255, 0.3);
+      padding: 1rem;
+      background: rgba(13, 27, 60, 0.6);
+      display: grid;
+      align-content: center;
+      gap: 0.7rem;
+    }
+
+    .about-note strong {
+      font-family: "Orbitron", sans-serif;
+      color: var(--gold);
+      font-size: 1.12rem;
+    }
+
+    footer {
+      padding: 2.2rem 0 3.2rem;
+      text-align: center;
+      color: #7f8db0;
+      font-size: 0.92rem;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes orbit {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes globeScroll {
+      from { transform: translate3d(0, 0, 0); }
+      to { transform: translate3d(-50%, 0, 0); }
+    }
+
+    @keyframes earthScroll {
+      from { transform: translate3d(0, 0, 0); }
+      to { transform: translate3d(-50%, 0, 0); }
+    }
+
+    @keyframes sheen {
+      0% { transform: translateX(-2%) translateY(-1%) rotate(-8deg); opacity: 0.55; }
+      50% { transform: translateX(2%) translateY(1%) rotate(6deg); opacity: 0.8; }
+      100% { transform: translateX(-2%) translateY(-1%) rotate(-8deg); opacity: 0.55; }
+    }
+
+    @keyframes dash {
+      to { stroke-dashoffset: -180; }
+    }
+
+    @keyframes slideCards {
+      0% { transform: translateX(0) rotate(0deg); }
+      100% { transform: translateX(16px) rotate(1.2deg); }
+    }
+
+    @media (max-width: 980px) {
+      .navbar {
+        grid-template-columns: 1fr;
+        border-radius: 20px;
+        justify-items: center;
+        gap: 0.8rem;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+        padding-top: 2.6rem;
+      }
+
+      .hero-content { order: 2; }
+      .globe-wrap { order: 1; }
+
+      .cards-track {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .about-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .menu { justify-content: center; }
+
+      .auth-actions { width: 100%; justify-content: center; }
+
+      .cards-track {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hero-actions .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles" aria-hidden="true"></canvas>
+
+  <div class="container navbar-wrap">
+    <nav class="navbar" aria-label="Main Navigation">
+      <a href="#home" class="brand">Skill<span>Swap</span></a>
+
+      <div class="menu">
+        <a href="#home">Home</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#about">About Us</a>
+      </div>
+
+      <div class="auth-actions">
+        <a href="login.html" id="loginBtn" class="btn btn-outline">Login</a>
+        <a href="register.html" id="registerBtn" class="btn btn-gold">Register</a>
+        <a href="profile.html" id="profileBtn" class="btn btn-outline" style="display:none;">Profile</a>
+        <button id="logoutBtn" class="btn btn-gold" style="display:none;" type="button">Logout</button>
+      </div>
+    </nav>
+  </div>
+
+  <main>
+    <section id="home" class="container hero">
+      <div class="globe-wrap reveal">
+        <div class="globe-stage">
+          <div class="orbit"></div>
+          <div class="orbit two"></div>
+          <div class="orbit three"></div>
+
+          <div class="globe" aria-label="Rotating globe">
+            <div class="earth-track" aria-hidden="true">
+              <div class="earth-panel"></div>
+              <div class="earth-panel"></div>
+            </div>
+          </div>
+          <div class="atmosphere" aria-hidden="true"></div>
+
+          <svg class="connectors" viewBox="0 0 560 560" role="img" aria-label="Global skill connection lines">
+            <path d="M145 238 C 210 160, 290 154, 360 214" />
+            <path d="M108 316 C 200 352, 300 352, 420 286" />
+            <path d="M186 402 C 268 304, 328 264, 438 236" />
+            <path d="M122 214 C 198 242, 250 286, 292 350" />
+            <path d="M250 122 C 322 174, 382 212, 420 300" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="hero-content reveal">
+        <span class="badge">Future of Peer Learning</span>
+        <h1>Exchange Skills,<br><span class="accent">Expand Horizons</span></h1>
+        <p>Skil
+          is a platform where people exchange skills, connect with others, and learn without money through a credit-based system.</p>
+
+        <div class="hero-actions">
+          <a href="register.html" class="btn btn-gold">Start Swapping</a>
+          <a href="#how-it-works" class="btn btn-outline">Explore Flow</a>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat"><strong>12K+</strong><span>Learners</span></div>
+          <div class="stat"><strong>340+</strong><span>Skills</span></div>
+          <div class="stat"><strong>60+</strong><span>Countries</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-it-works" class="section container reveal">
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-sub">Join in minutes, share what you know, and gain credits by helping others learn. Use those credits to learn from the community.</p>
+
+      <div class="cards-track">
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c2-4 5-6 8-6s6 2 8 6"></path></svg>
+          </div>
+          <h3>Register Account</h3>
+          <p>Create your profile and set your learning goals to enter a trusted network of students, mentors, and professionals.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0 0 6v1a3 3 0 0 0 3 3"></path><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 0 6v1a3 3 0 0 1-3 3"></path><path d="M9 8h6M9 12h6M9 16h6"></path></svg>
+          </div>
+          <h3>Add Skills You Can Teach</h3>
+          <p>List your strengths, from coding and design to languages and music, and decide your preferred teaching style.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M7 13l3 3a2 2 0 0 0 3 0l4-4"></path><path d="M3 10l4-4 4 4M13 18l4-4 4 4"></path></svg>
+          </div>
+          <h3>Get Matched with Learners</h3>
+          <p>Our matching flow connects you with people whose goals align with your skill set and availability.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M9 12l-2 8 5-3 5 3-2-8"></path></svg>
+          </div>
+          <h3>Learn & Earn Credits</h3>
+          <p>Teach to earn credits, then use them to learn from others. No money involved, just community-powered growth.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="about" class="section container reveal">
+      <h2 class="section-title">About Us</h2>
+      <p class="section-sub">SkillSwap is built for peer-to-peer learning where knowledge flows both ways. We remove money from the equation and make collaboration the core value.</p>
+
+      <div class="about-panel">
+        <ul>
+          <li><strong>Peer-to-Peer Learning:</strong> Everyone can be both a teacher and a learner.</li>
+          <li><strong>No Money System:</strong> A credit-based exchange keeps access fair and inclusive.</li>
+          <li><strong>Community Driven:</strong> Learners shape the ecosystem by sharing, mentoring, and supporting each other.</li>
+        </ul>
+
+        <div class="about-note">
+          <strong>Built for college communities and ambitious creators.</strong>
+          <p>Whether you want to teach coding, public speaking, editing, or math, SkillSwap helps you grow your network while growing your skills.</p>
+          <a href="register.html" class="btn btn-gold">Join the Community</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 SkillSwap. Learn, teach, and grow together.
+  </footer>
+
+  <script>
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const profileBtn = document.getElementById('profileBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    function getCurrentUser() {
+      try {
+        return JSON.parse(localStorage.getItem('skillswap_current_user') || 'null');
+      } catch {
+        return null;
+      }
+    }
+
+    function renderNavbarByAuthState() {
+      const isLoggedIn = Boolean(getCurrentUser());
+      loginBtn.style.display = isLoggedIn ? 'none' : 'inline-flex';
+      registerBtn.style.display = isLoggedIn ? 'none' : 'inline-flex';
+      profileBtn.style.display = isLoggedIn ? 'inline-flex' : 'none';
+      logoutBtn.style.display = isLoggedIn ? 'inline-flex' : 'none';
+    }
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('skillswap_current_user');
+      window.location.href = 'index.html';
+    });
+
+    renderNavbarByAuthState();
+
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.18 });
+
+    reveals.forEach((el) => observer.observe(el));
+
+    const globeWrap = document.querySelector('.globe-wrap');
+    const globeStage = document.querySelector('.globe-stage');
+
+    if (globeWrap && globeStage) {
+      globeWrap.addEventListener('mousemove', (event) => {
+        const rect = globeWrap.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width;
+        const y = (event.clientY - rect.top) / rect.height;
+        const tiltY = (x - 0.5) * 22;
+        const tiltX = (0.5 - y) * 18;
+        globeStage.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+      });
+
+      globeWrap.addEventListener('mouseleave', () => {
+        globeStage.style.transform = 'rotateX(0deg) rotateY(0deg)';
+      });
+    }
+
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const total = 80;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function createParticle() {
+      return {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.7 + 0.45,
+        vx: (Math.random() - 0.5) * 0.22,
+        vy: (Math.random() - 0.5) * 0.22,
+        a: Math.random() * 0.6 + 0.2
+      };
+    }
+
+    function initParticles() {
+      particles.length = 0;
+      for (let i = 0; i < total; i += 1) {
+        particles.push(createParticle());
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < particles.length; i += 1) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(248, 204, 63, ${p.a})`;
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        for (let j = i + 1; j < particles.length; j += 1) {
+          const q = particles[j];
+          const dx = p.x - q.x;
+          const dy = p.y - q.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 110) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(76, 201, 255, ${0.08 * (1 - dist / 110)})`;
+            ctx.lineWidth = 1;
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(q.x, q.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', () => {
+      resize();
+      initParticles();
+    });
+
+    resize();
+    initParticles();
+    draw();
+  </script>
+</body>
+</html>

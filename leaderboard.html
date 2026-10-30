@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap | Leaderboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="app-layout.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <a class="brand" href="index.html">Skill<span>Swap</span></a>
+      <section class="user-card">
+        <p class="user-label">USERNAME</p>
+        <p class="user-name" id="sidebarName">user</p>
+        <p class="user-meta" id="sidebarMeta">Branch | Year</p>
+      </section>
+      <nav class="nav">
+        <a href="dash.html" data-page="dash">Dashboard</a>
+        <a href="connection.html" data-page="connections">Connections</a>
+        <a href="meetings.html" data-page="meetings">Meetings</a>
+        <a href="Ai_match.html" data-page="ai">AI Matching</a>
+        <a href="creds_batch.html" data-page="credits">Credits & Badges</a>
+        <a href="leaderboard.html" data-page="leaderboard">Leaderboard</a>
+        <a href="notes.html" data-page="notes">Notes Market</a>
+        <a href="consult.html" data-page="consult">Hire Consultant</a>
+        <a href="profile.html" data-page="profile">Edit Profile</a>
+      </nav>
+      <div class="spacer"></div>
+      <button id="logoutBtn" class="btn btn-gold" type="button">Logout</button>
+    </aside>
+
+    <main class="main-area">
+      <section class="topbar">
+        <input id="topSearch" class="search" type="search" placeholder="Search leaderboard..." />
+        <div class="top-chip">Notifications: 4</div>
+        <div id="topProfileName" class="top-chip">Profile</div>
+      </section>
+
+      <section class="panel hero">
+        <h1>Leaderboard & Achievements</h1>
+        <p>Top contributors by credits with personal rank and milestones.</p>
+      </section>
+
+      <section class="grid">
+        <article class="panel">
+          <h2 style="margin:0 0 .6rem;font-family:Sora,sans-serif;">Top Users</h2>
+          <table class="table">
+            <thead><tr><th>#</th><th>Name</th><th>Credits</th><th>Badge</th></tr></thead>
+            <tbody id="leaderRows"></tbody>
+          </table>
+        </article>
+
+        <article class="panel">
+          <h2 style="margin:0 0 .6rem;font-family:Sora,sans-serif;">Your Rank</h2>
+          <p id="myRank" style="font-size:2rem;margin:.2rem 0;color:#ffe089;">#-</p>
+          <p id="myCredits" class="muted">Credits: 0</p>
+          <p id="myBadge" class="muted">Badge: Beginner</p>
+          <div class="progress"><span id="myProgress" style="width:10%;"></span></div>
+
+          <div style="margin-top:.8rem;" class="list" id="achievementList"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="app-layout.js"></script>
+  <script>
+    const user = SkillSwapApp.requireAuth();
+    if (!user) throw new Error("Auth required");
+    SkillSwapApp.setShell(user, "leaderboard");
+
+    function badge(credits) {
+      if (credits >= 600) return "Mentor";
+      if (credits >= 350) return "Expert";
+      if (credits >= 180) return "Intermediate";
+      return "Beginner";
+    }
+
+    function milestoneRows(credits) {
+      const milestones = [
+        { title: "100 Credits", ok: credits >= 100 },
+        { title: "10 Sessions Completed", ok: credits >= 220 },
+        { title: "Top Contributor", ok: credits >= 500 }
+      ];
+      return milestones.map((m) => `<div><span class="badge ${m.ok ? "ok" : "warn"}">${m.ok ? "Unlocked" : "In Progress"}</span> <span style="margin-left:.4rem;">${m.title}</span></div>`).join("");
+    }
+
+    async function loadBoard() {
+      let data;
+      try {
+        data = await SkillSwapApp.api(`/leaderboard${user.id ? `?userId=${user.id}` : ""}`);
+      } catch {
+        const myCredits = 240;
+        data = {
+          leaderboard: [
+            { name: "Riya Nair", credits: 680 },
+            { name: "Aarav Mehta", credits: 530 },
+            { name: "Sneha Iyer", credits: 420 },
+            { name: user.username || "You", credits: myCredits },
+            { name: "Karan Verma", credits: 190 }
+          ]
+        };
+      }
+
+      const list = (data.leaderboard || []).sort((a, b) => b.credits - a.credits);
+      document.getElementById("leaderRows").innerHTML = list.map((row, idx) => `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${row.name}</td>
+          <td>${row.credits}</td>
+          <td>${badge(row.credits)}</td>
+        </tr>
+      `).join("");
+
+      const meName = (user.name || user.username || "").toLowerCase();
+      const mine = list.find((item) => String(item.name).toLowerCase() === meName) || { name: user.username || "You", credits: 240 };
+      const rank = list.findIndex((item) => item.name === mine.name) + 1;
+
+      document.getElementById("myRank").textContent = rank > 0 ? `#${rank}` : "#-";
+      document.getElementById("myCredits").textContent = `Credits: ${mine.credits}`;
+      document.getElementById("myBadge").textContent = `Badge: ${badge(mine.credits)}`;
+      document.getElementById("myProgress").style.width = `${Math.min(100, Math.round((mine.credits / 600) * 100))}%`;
+      document.getElementById("achievementList").innerHTML = milestoneRows(mine.credits);
+    }
+
+    document.addEventListener("skillswap-search", (event) => {
+      const keyword = event.detail;
+      document.querySelectorAll("#leaderRows tr").forEach((row) => {
+        row.style.display = !keyword || row.textContent.toLowerCase().includes(keyword) ? "" : "none";
+      });
+    });
+
+    loadBoard();
+  </script>
+</body>
+</html>
